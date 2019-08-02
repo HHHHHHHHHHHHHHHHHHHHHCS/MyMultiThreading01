@@ -180,7 +180,7 @@ public class MyLooper : MonoBehaviour
         removeList = null;
         actDict?.Clear();
         actDict = null;
-        
+
         //如果不是Unity 删除的则要自己删除
         if (!isUnity)
         {
@@ -199,12 +199,13 @@ public class MyLooper : MonoBehaviour
         var key = LoopAction.AddAutoActId();
 
         if (key == 0)
-        {//刚进入第二轮
+        {
+            //刚进入第二轮
             isFirst = false;
             return;
         }
 
-        if (isFirst) return;//还在第一轮
+        if (isFirst) return; //还在第一轮
         //这里不同while是避免死循环
         for (int i = 0; i < c_maxCount; i++)
         {
@@ -214,19 +215,22 @@ public class MyLooper : MonoBehaviour
             }
             else
             {
-                break;
+                return;
             }
         }
+
+        Debug.LogError("MyLooper out maxCount");
     }
 
     public static int Call(float time, Action act)
     {
         InitGo();
         inst.AutoAddId();
-        var loopAct = new LoopAction(time,act);
+        var loopAct = new LoopAction(time, act);
         inst.actDict.TryAdd(loopAct.actId, loopAct);
         if (time <= 0)
-        {//如果设置的时间小于等于零 默认是下一帧数执行
+        {
+            //如果设置的时间小于等于零 默认是下一帧数执行
             inst.haveTimeOver = true;
         }
 
@@ -236,5 +240,11 @@ public class MyLooper : MonoBehaviour
     public static bool Remove(int actId)
     {
         return !inst || inst.actDict.TryRemove(actId, out var _);
+    }
+
+    public static void PrintLog()
+    {
+        Debug.Log("Now Id:" + LoopAction.AutoActId +
+                  (inst ? ("    Now Dicts Count:" + inst.actDict.Count.ToString()) : "   inst is null"));
     }
 }
